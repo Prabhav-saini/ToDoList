@@ -1,15 +1,13 @@
 package org.example.Entities;
 
-import javax.annotation.PostConstruct;
+
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 
-
+@Entity
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"status", "priority"})})
 public class Task {
-    public Task(User user) {
-        this.assignee = user;
-    }
-
     public enum Priority {
         LOW, MEDIUM, HIGH
     }
@@ -17,18 +15,25 @@ public class Task {
     public enum Status {
         TODO, IN_PROGRESS, IN_REVIEW, COMPLETED
     }
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "task_id")
     private int id;
     private String title;
+    @Column(columnDefinition = "text")
     private String description;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime dueDate;
+    @Enumerated(EnumType.STRING)
     private Status status;
+    @Enumerated(EnumType.STRING)
     private Priority priority;
+    @OneToOne
     private User assignee;
 
-    public Task(int id, String title, String description, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime dueDate, Status status, Priority priority, User assignee, User reporter) {
-        this.id = id;
+    public Task(String title, String description, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime dueDate, Status status, Priority priority, User assignee) {
         this.title = title;
         this.description = description;
         this.createdAt = createdAt;
@@ -115,6 +120,11 @@ public class Task {
         this.assignee = assignee;
     }
 
+    public Task(User user) {
+        this.assignee = user;
+    }
+
+
     @Override
     public String toString() {
         return "Task{" +
@@ -128,31 +138,6 @@ public class Task {
                 ", priority=" + priority +
                 ", assignee=" + assignee +
                 '}';
-    }
-
-    @PostConstruct
-    public void init() {
-        // Define the message and border symbol
-        String message = "TO DO LIST MANAGER";
-        char borderSymbol = '*';
-
-        // Calculate the length for the border
-        int borderLength = message.length() + 4; // 4 for padding
-
-        // Print the top border
-        printBorder(borderLength, borderSymbol);
-        // Print the message with padding
-        System.out.println(borderSymbol + " " + message + " " + borderSymbol);
-        // Print the bottom border
-        printBorder(borderLength, borderSymbol);
-    }
-
-    // Method to print the border
-    private static void printBorder(int length, char symbol) {
-        for (int i = 0; i < length; i++) {
-            System.out.print(symbol);
-        }
-        System.out.println();
     }
 
 }
