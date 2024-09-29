@@ -1,7 +1,6 @@
 package org.example;
 
 import org.example.Configuration.ToDoConfig;
-import org.example.Entities.Task;
 import org.example.Entities.User;
 import org.example.Services.TaskService;
 import org.example.Services.UserService;
@@ -10,7 +9,6 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.time.LocalDateTime;
 
 public class ToDoApplication {
 
@@ -32,7 +30,7 @@ public class ToDoApplication {
 
             System.out.println("Press 1 To Manage Tasks");
             System.out.println("Press 2 To Manage Users");
-            System.out.println("Press 3 To Exit Program");
+            System.out.println("Press 3 To Exit Program : ");
 
             try {
                 int choice = Integer.parseInt(br.readLine());
@@ -50,8 +48,8 @@ public class ToDoApplication {
                         exit = true;
                         break;
                     default:
-                        System.out.println("INVALID INPUT");
-                        System.out.println("Please Choose From Given Values On Screen :");
+                        System.out.println("!!! INVALID INPUT !!!");
+                        System.out.println("Please Choose From Given Values On Screen : ");
 
                 }
             } catch (Exception e) {
@@ -71,10 +69,11 @@ public class ToDoApplication {
             System.out.println("Press 3 To Delete A Task");
             System.out.println("Press 4 To View A Task");
             System.out.println("Press 5 To View All Tasks");
-            System.out.println("Press 6 To Go Back To Main Menu");
+            System.out.println("Press 6 To Go Back To Main Menu : ");
 
             try {
                 int choice = Integer.parseInt(br.readLine());
+                TaskService taskService = context.getBean(TaskService.class);
 
                 switch (choice) {
                     case 1:
@@ -91,8 +90,8 @@ public class ToDoApplication {
                         exit = true;
                         break;
                     default:
-                        System.out.println("INVALID INPUT");
-                        System.out.println("Please Choose From Given Values On Screen :");
+                        System.out.println("!!! INVALID INPUT !!!");
+                        System.out.println("Please Choose From Given Values On Screen : ");
 
                 }
             } catch (Exception e) {
@@ -113,33 +112,41 @@ public class ToDoApplication {
             System.out.println("Press 3 To Delete A user");
             System.out.println("Press 4 To View A user");
             System.out.println("Press 5 To View All user");
-            System.out.println("Press 6 To Go Back To Main Menu");
+            System.out.println("Press 6 To Go Back To Main Menu : ");
 
             try {
                 int choice = Integer.parseInt(br.readLine());
-
+                UserService userService = context.getBean(UserService.class);
                 switch (choice) {
                     case 1:
-                        UserService userService = context.getBean(UserService.class);
-                        User user = userService.prepareUser(br);
+                        User user = userService.prepareUserToCreate(br);
                         User createdUser = userService.createUser(user);
                         System.out.println(String.format("User created with Id: %s And Email: %s", createdUser.getId(), createdUser.getEmail()));
                         break;
 
                     case 2:
-                        // update user
+                        System.out.println("Enter Email_Id Of User You Want To Update : ");
+                        String UpdateResponse = userService.updateUser(br.readLine(), br);
+                        System.out.println(UpdateResponse);
+                        break;
                     case 3:
-                        // delete user
+                        System.out.println("Enter Email_Id Of User You Want To Delete : ");
+                        String deletionResponse = userService.deleteUser(br.readLine());
+                        System.out.println(deletionResponse);
+                        break;
                     case 4:
-                        // view user
+                        System.out.println("Enter Email_id Of User You Want To View : ");
+                        userService.readUser(br.readLine());
+                        break;
                     case 5:
-                        // view all users
+                        userService.readAllUsers();
+                        break;
                     case 6:
                         exit = true;
                         break;
                     default:
-                        System.out.println("INVALID INPUT");
-                        System.out.println("Please Choose From Given Values On Screen :");
+                        System.out.println("!!! INVALID INPUT !!!");
+                        System.out.println("Please Choose From Given Values On Screen : ");
 
                 }
             } catch (Exception e) {

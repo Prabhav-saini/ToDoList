@@ -1,6 +1,7 @@
 package org.example.Entities;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 public class User {
@@ -14,6 +15,10 @@ public class User {
     private boolean isManager;
     @Column(unique = true)
     private String email;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    @Version
+    private int version; // It will help us to know how many times user got updated
 
     public User(String firstName, String lastName, String mobileNumber, boolean isManager, String email) {
         this.firstName = firstName;
@@ -73,6 +78,22 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     @Override
