@@ -98,13 +98,10 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", firstName=" + firstName +
-                ", lastName=" + lastName +
+        return "id=" + id +
+                ", Name=" + firstName + " " + lastName +
                 ", mobileNumber=" + mobileNumber +
                 ", isManager=" + isManager +
-                ", email=" + email +
-                '}';
+                ", email=" + email;
     }
 }
