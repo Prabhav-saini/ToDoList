@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 public class UserService {
@@ -18,18 +21,42 @@ public class UserService {
     @Autowired
     private SessionFactory sessionFactory;
 
+    final String userDoesNotExist = "User Does Not Exist With This Email_Id, Please Try Again With Correct Email_Id";
+
     public UserService(UserDao userDao) {
         this.userDao = userDao;
     }
 
-    @Transactional // This can manage the transaction for createTask
+    @Transactional
     public User createUser(User user) {
         Session session = sessionFactory.getCurrentSession();
         session.setFlushMode(FlushMode.AUTO);
+        user.setCreatedAt(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now());
         return userDao.createUser(user);
     }
 
-    public User prepareUser(BufferedReader br) throws IOException {
+    @Transactional
+    public String updateUser(String userEmail, BufferedReader br) throws IOException {
+        User existingUser = userDao.readUserByEmail(userEmail);
+        if (Objects.isNull(existingUser)) {
+            return userDoesNotExist;
+        } else {
+            User user = prepareUserToUpdate(br, existingUser);
+            user.setId(existingUser.getId());
+            user.setUpdatedAt(LocalDateTime.now());
+            userDao.updateUser(user);
+            return String.format("User Is SuccessFully Updated With Email : %s", user.getEmail());
+        }
+    }
+
+    @Transactional
+    public void readUser(String userEmail) {
+        User user = userDao.readUserByEmail(userEmail);
+        System.out.println(user.toString());
+    }
+
+    public User prepareUserToCreate(BufferedReader br) throws IOException {
         System.out.println("Enter First Name Of User : ");
         String fName = br.readLine();
         System.out.println("Enter Last Name Of User : ");
@@ -43,4 +70,35 @@ public class UserService {
         return new User(fName, lName, mob, Boolean.parseBoolean(isManager), email);
     }
 
+    public User prepareUserToUpdate(BufferedReader br, User user) throws IOException {
+        System.out.println("Enter First Name Of User : ");
+        user.setFirstName(br.readLine());
+        System.out.println("Enter Last Name Of User : ");
+        user.setLastName(br.readLine());
+        System.out.println("Enter Mobile Number Of User : ");
+        user.setMobileNumber(br.readLine());
+        System.out.println("Is This User A Manager? true/false : ");
+        user.setManager(Boolean.parseBoolean(br.readLine()));
+        System.out.println("Enter Email_Id of User : ");
+        user.setEmail(br.readLine());
+        return user;
+    }
+
+    @Transactional
+    public String deleteUser(String userEmail) {
+        User user = userDao.readUserByEmail(userEmail);
+        if (Objects.nonNull(user)) {
+            userDao.deleteUser(user);
+            return String.format("User Deleted Successfully With Email_Id : %s", userEmail);
+        } else {
+            return userDoesNotExist;
+        }
+    }
+
+    @Transactional
+    public void readAllUsers() {
+        List<User> users = userDao.readAllUsers();
+        users.stream().map(User::toString)
+                .forEach(System.out::println);
+    }
 }
