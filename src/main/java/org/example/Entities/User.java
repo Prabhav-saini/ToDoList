@@ -1,20 +1,26 @@
 package org.example.Entities;
 
-import javax.annotation.PostConstruct;
+import javax.persistence.*;
 
+@Entity
 public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private int id;
-    private int firstName;
-    private int lastName;
-    private long mobileNumber;
+    private String firstName;
+    private String lastName;
+    private String mobileNumber;
     private boolean isManager;
+    @Column(unique = true)
+    private String email;
 
-    public User(int id, int firstName, int lastName, long mobileNumber, boolean isManager) {
-        this.id = id;
+    public User(String firstName, String lastName, String mobileNumber, boolean isManager, String email) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.mobileNumber = mobileNumber;
         this.isManager = isManager;
+        this.email = email;
     }
 
     public User() {
@@ -29,27 +35,27 @@ public class User {
         this.id = id;
     }
 
-    public int getFirstName() {
+    public String getFirstName() {
         return firstName;
     }
 
-    public void setFirstName(int firstName) {
+    public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
 
-    public int getLastName() {
+    public String getLastName() {
         return lastName;
     }
 
-    public void setLastName(int lastName) {
+    public void setLastName(String lastName) {
         this.lastName = lastName;
     }
 
-    public long getMobileNumber() {
+    public String getMobileNumber() {
         return mobileNumber;
     }
 
-    public void setMobileNumber(long mobileNumber) {
+    public void setMobileNumber(String mobileNumber) {
         this.mobileNumber = mobileNumber;
     }
 
@@ -61,6 +67,14 @@ public class User {
         isManager = manager;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -69,6 +83,7 @@ public class User {
                 ", lastName=" + lastName +
                 ", mobileNumber=" + mobileNumber +
                 ", isManager=" + isManager +
+                ", email=" + email +
                 '}';
     }
 }
