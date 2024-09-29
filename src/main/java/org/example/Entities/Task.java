@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 
 
 @Entity
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"status", "priority"})})
 public class Task {
     public enum Priority {
         LOW, MEDIUM, HIGH

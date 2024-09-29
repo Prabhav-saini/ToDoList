@@ -12,12 +12,15 @@ public class User {
     private String lastName;
     private String mobileNumber;
     private boolean isManager;
+    @Column(unique = true)
+    private String email;
 
-    public User(String firstName, String lastName, String mobileNumber, boolean isManager) {
+    public User(String firstName, String lastName, String mobileNumber, boolean isManager, String email) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.mobileNumber = mobileNumber;
         this.isManager = isManager;
+        this.email = email;
     }
 
     public User() {
@@ -64,6 +67,14 @@ public class User {
         isManager = manager;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -72,6 +83,7 @@ public class User {
                 ", lastName=" + lastName +
                 ", mobileNumber=" + mobileNumber +
                 ", isManager=" + isManager +
+                ", email=" + email +
                 '}';
     }
 }
