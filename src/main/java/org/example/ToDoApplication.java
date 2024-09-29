@@ -21,14 +21,6 @@ public class ToDoApplication {
         ApplicationContext context = new AnnotationConfigApplicationContext(ToDoConfig.class);
         applicationBranding(); // Printing Application Branding
         openMenu(context); // Main Menu Method
-        TaskService taskService = context.getBean(TaskService.class);
-        UserService userService = context.getBean(UserService.class);
-        User user = new User("String_firstName", "String lastName", "8267978774", true, "prabhav.ksaini@gmail.com");
-        User cretaedUser = userService.createUser(user);
-
-        Task newTask = new Task("String title", "String description", LocalDateTime.now(), LocalDateTime.now(), LocalDateTime.now(), Task.Status.TODO, Task.Priority.LOW, cretaedUser);
-        int r = taskService.createTask(newTask);
-        System.out.println(r);
     }
 
     private static void openMenu(ApplicationContext context) {
@@ -72,9 +64,8 @@ public class ToDoApplication {
     private static void taskManager(ApplicationContext context, BufferedReader br) {
         boolean exit = false;
 
-        System.out.println("*************************** TASK MANAGER PORTAL ***************************");
-
         do {
+            System.out.println("*************************** TASK MANAGER PORTAL ***************************");
             System.out.println("Press 1 To Create A Task");
             System.out.println("Press 2 To Update A Task");
             System.out.println("Press 3 To Delete A Task");
@@ -115,9 +106,8 @@ public class ToDoApplication {
     private static void userManager(ApplicationContext context, BufferedReader br) {
         boolean exit = false;
 
-        System.out.println("*************************** USER MANAGER PORTAL ***************************");
-
         do {
+            System.out.println("*************************** USER MANAGER PORTAL ***************************");
             System.out.println("Press 1 To Create A user");
             System.out.println("Press 2 To Update A user");
             System.out.println("Press 3 To Delete A user");
@@ -130,7 +120,12 @@ public class ToDoApplication {
 
                 switch (choice) {
                     case 1:
-                        // create user
+                        UserService userService = context.getBean(UserService.class);
+                        User user = userService.prepareUser(br);
+                        User createdUser = userService.createUser(user);
+                        System.out.println(String.format("User created with Id: %s And Email: %s", createdUser.getId(), createdUser.getEmail()));
+                        break;
+
                     case 2:
                         // update user
                     case 3:
@@ -171,4 +166,6 @@ public class ToDoApplication {
     private static void printBorder(int length, char symbol) {
         System.out.println(String.format("%" + length + "s", "").replace(" ", String.valueOf(symbol)));
     }
+
+
 }
