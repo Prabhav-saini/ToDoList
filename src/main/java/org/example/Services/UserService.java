@@ -56,6 +56,29 @@ public class UserService {
         System.out.println(user.toString());
     }
 
+    @Transactional
+    public User getUserIfExistOrCreate(String userEmail, BufferedReader br) throws IOException {
+        User user = userDao.readUserByEmail(userEmail);
+        User newUser = null;
+        if (Objects.nonNull(user)) {
+            newUser = user;
+        } else {
+            System.out.println("This User Does Not Exist Do You Want To create New User With This Email_Id? Y/N");
+            String input = br.readLine();
+            char choice = input.charAt(0);
+            switch (choice) {
+                case 'Y':
+                    System.out.println("creating And Assigning New User to This Task");
+                    System.out.println("Please Update Other Details Of New USer Later");
+                    newUser = createUser(new User(null, null, null, false, userEmail));
+                    break;
+                case 'N':
+                    System.out.println("Please Enter Correct Email_Id");
+            }
+        }
+        return newUser;
+    }
+
     public User prepareUserToCreate(BufferedReader br) throws IOException {
         System.out.println("Enter First Name Of User : ");
         String fName = br.readLine();

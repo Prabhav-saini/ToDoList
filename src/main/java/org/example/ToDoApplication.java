@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.Configuration.ToDoConfig;
+import org.example.Entities.Task;
 import org.example.Entities.User;
 import org.example.Services.TaskService;
 import org.example.Services.UserService;
@@ -9,6 +10,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Objects;
 
 public class ToDoApplication {
 
@@ -77,15 +79,32 @@ public class ToDoApplication {
 
                 switch (choice) {
                     case 1:
-                        // create task
+                        Task task = taskService.prepareTaskToCreate(br);
+                        if (Objects.nonNull(task.getAssignee())) {
+                            Task createdTask = taskService.createTask(task);
+                            System.out.println(String.format("Task Created Successfully With Id %s : ", createdTask.getId()));
+                            break;
+                        } else {
+                            break;
+                        }
+
                     case 2:
-                        // update task
+                        System.out.println("Enter Id Of Task Which You Want To Update : ");
+                        String updateResponse = taskService.updateTask(Integer.parseInt(br.readLine()), br);
+                        System.out.println(updateResponse);
+                        break;
                     case 3:
-                        // delete task
+                        System.out.println("Enter Id Of Task Which You Want To Delete : ");
+                        String deleteResponse = taskService.deleteTask(Integer.parseInt(br.readLine()));
+                        System.out.println(deleteResponse);
+                        break;
                     case 4:
-                        // view task
+                        System.out.println("Enter Id Of Task Which You Want To View : ");
+                        taskService.viewTask(Integer.parseInt(br.readLine()));
+                        break;
                     case 5:
-                        // view all tasks
+                        taskService.viewAllTasks();
+                        break;
                     case 6:
                         exit = true;
                         break;
