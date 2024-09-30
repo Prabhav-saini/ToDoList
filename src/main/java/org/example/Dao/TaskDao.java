@@ -9,6 +9,8 @@ import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Repository
 public class TaskDao {
 
@@ -26,26 +28,24 @@ public class TaskDao {
     }
 
     @Transactional
-    public int createTask(Task task) {
+    public Task createTask(Task task) {
         Session session = sessionFactory.getCurrentSession();
         session.setFlushMode(FlushMode.AUTO);
         hibernateTemplate.save(task);
-        return task.getId();
+        return task;
     }
 
-    public int updateTask(Task task) {
-        hibernateTemplate.save(task);
-        return task.getId();
+    @Transactional
+    public void updateTask(Task task) {
+        hibernateTemplate.update(task);
     }
 
-    public int deleteTask(Task task) {
-        hibernateTemplate.save(task);
-        return task.getId();
+    public void deleteTask(Task task) {
+        hibernateTemplate.delete(task);
     }
 
-    public int viewTask(Task task) {
-        hibernateTemplate.save(task);
-        return task.getId();
+    public Task viewTaskById(int id) {
+        return hibernateTemplate.get(Task.class, id);
     }
 
     public int markComplete(Task task) {
@@ -53,4 +53,7 @@ public class TaskDao {
         return task.getId();
     }
 
+    public List<Task> getAllTasks() {
+        return hibernateTemplate.loadAll(Task.class);
+    }
 }
