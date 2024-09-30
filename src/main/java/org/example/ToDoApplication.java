@@ -49,7 +49,7 @@ public class ToDoApplication {
                         break;
                     default:
                         System.out.println("!!! INVALID INPUT !!!");
-                        System.out.println("Please Choose From Given Values On Screen : ");
+                        System.out.println("Please Choose From Given Values On Screen!");
 
                 }
             } catch (Exception e) {
@@ -91,7 +91,7 @@ public class ToDoApplication {
                         break;
                     default:
                         System.out.println("!!! INVALID INPUT !!!");
-                        System.out.println("Please Choose From Given Values On Screen : ");
+                        System.out.println("Please Choose From Given Values On Screen");
 
                 }
             } catch (Exception e) {
@@ -146,7 +146,7 @@ public class ToDoApplication {
                         break;
                     default:
                         System.out.println("!!! INVALID INPUT !!!");
-                        System.out.println("Please Choose From Given Values On Screen : ");
+                        System.out.println("Please Choose From Given Values On Screen");
 
                 }
             } catch (Exception e) {
