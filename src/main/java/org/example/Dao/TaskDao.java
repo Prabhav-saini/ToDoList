@@ -40,6 +40,7 @@ public class TaskDao {
         hibernateTemplate.update(task);
     }
 
+    @Transactional
     public void deleteTask(Task task) {
         hibernateTemplate.delete(task);
     }

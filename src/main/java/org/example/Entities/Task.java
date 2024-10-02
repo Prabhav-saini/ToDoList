@@ -134,7 +134,7 @@ public class Task {
                 ", dueDate=" + dueDate +
                 ", status=" + status +
                 ", priority=" + priority +
-                ", assignee=" + assignee;
+                ", assignee=" + assignee.getEmail();
     }
 
 }
