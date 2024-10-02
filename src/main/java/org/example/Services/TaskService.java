@@ -3,19 +3,43 @@ package org.example.Services;
 import org.example.Dao.TaskDao;
 import org.example.Entities.Task;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Objects;
 
 @Service
 public class TaskService {
 
+    public enum TaskError {
+        NULL_TASK("!!! Task Can Not Be Null !!!"),
+        INVALID_EMAIL("!!! Email Is Not Valid !!!"),
+        NULL_TITLE("!!! Title Can Not Be Empty !!!"),
+        NULL_DESCRIPTION("!!! Description Can Not Be Empty !!!"),
+        VALID_TASK("Valid"),
+        INVALID_DUE_DATE("!!! DueDate Format Is Invalid !!!");
+
+        private final String msg;
+
+        TaskError(String msg) {
+            this.msg = msg;
+        }
+
+        public String getMsg() {
+            return msg;
+        }
+    }
+
     final String taskDoesNotExist = "Task Does Not Exist With Id, Please Try Again With Correct Id";
+    private static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
 
     private final TaskDao taskDao;
     private final UserService userService;
@@ -33,10 +57,8 @@ public class TaskService {
         return taskDao.createTask(task);
     }
 
-    public Task prepareTaskToCreate(BufferedReader br) throws IOException {
+    public Task prepareTaskToCreate(BufferedReader br) throws IOException, DateTimeParseException {
         Task task = new Task();
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         System.out.println("Enter Title Of This Task : ");
         task.setTitle(br.readLine());
         System.out.println("Write A Short Description About This Task : ");
@@ -51,8 +73,7 @@ public class TaskService {
         return task;
     }
 
-    public Task prepareTaskToUpdate(Task task, BufferedReader br) throws IOException {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    public Task prepareTaskToUpdate(Task task, BufferedReader br) throws IOException, DateTimeParseException {
         System.out.println("Update Title Of This Task : ");
         task.setTitle(br.readLine());
         System.out.println("Update Description About This Task : ");
@@ -71,11 +92,20 @@ public class TaskService {
     public String updateTask(int id, BufferedReader br) throws IOException {
         Task task = readtask(id);
         if (Objects.nonNull(task)) {
-            Task updatedTask = prepareTaskToUpdate(task, br);
-            updatedTask.setId(task.getId());
-            updatedTask.setUpdatedAt(LocalDateTime.now());
-            taskDao.updateTask(updatedTask);
-            return String.format("Task Is SuccessFully Updated With Id : %s", updatedTask.getId());
+            try {
+                Task updatedTask = prepareTaskToUpdate(task, br);
+                String taskValidationResponse = taskValidation(task);
+                if (taskValidationResponse.equalsIgnoreCase("Valid")) {
+                    updatedTask.setId(task.getId());
+                    updatedTask.setUpdatedAt(LocalDateTime.now());
+                    taskDao.updateTask(updatedTask);
+                    return String.format("Task Is SuccessFully Updated With Id : %s", updatedTask.getId());
+                } else {
+                    return taskValidationResponse;
+                }
+            } catch (DateTimeParseException e) {
+                return TaskError.INVALID_DUE_DATE.getMsg();
+            }
         } else {
             return taskDoesNotExist;
         }
@@ -105,5 +135,25 @@ public class TaskService {
         List<Task> tasks = taskDao.getAllTasks();
         tasks.stream().map(Task::toString)
                 .forEach(System.out::println);
+    }
+
+    public String taskValidation(Task task) {
+        if (Objects.isNull(task)) {
+            return TaskError.NULL_TASK.getMsg();
+        }
+
+        if (StringUtils.isEmpty(task.getTitle())) {
+            return TaskError.NULL_TITLE.getMsg();
+        }
+
+        if (StringUtils.isEmpty(task.getDescription())) {
+            return TaskError.NULL_DESCRIPTION.getMsg();
+        }
+
+        if (StringUtils.isEmpty(task.getAssignee().getEmail()) || !task.getAssignee().getEmail().matches(EMAIL_REGEX)) {
+            return TaskError.INVALID_EMAIL.getMsg();
+        }
+
+        return TaskError.VALID_TASK.getMsg();
     }
 }

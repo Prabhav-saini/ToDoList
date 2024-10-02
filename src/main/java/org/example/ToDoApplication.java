@@ -10,6 +10,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.time.format.DateTimeParseException;
 import java.util.Objects;
 
 public class ToDoApplication {
@@ -79,14 +80,28 @@ public class ToDoApplication {
 
                 switch (choice) {
                     case 1:
-                        Task task = taskService.prepareTaskToCreate(br);
-                        if (Objects.nonNull(task.getAssignee())) {
-                            Task createdTask = taskService.createTask(task);
-                            System.out.println(String.format("Task Created Successfully With Id %s : ", createdTask.getId()));
-                            break;
-                        } else {
+                        Task task = null;
+                        try {
+                            task = taskService.prepareTaskToCreate(br);
+                        } catch (DateTimeParseException e) {
+                            System.out.println(TaskService.TaskError.INVALID_DUE_DATE.getMsg());
+                            break; // Exit early if the date is invalid
+                        }
+
+                        if (Objects.isNull(task) || Objects.isNull(task.getAssignee())) {
+                            System.out.println("!!!It Seems Task Provided Values Are Not Valid Please Recheck!!!");
                             break;
                         }
+
+                        String taskValidationResponse = taskService.taskValidation(task);
+                        if (!taskValidationResponse.equalsIgnoreCase("Valid")) {
+                            System.out.println(taskValidationResponse);
+                            break;
+                        }
+
+                        Task createdTask = taskService.createTask(task);
+                        System.out.println(String.format("Task Created Successfully With Id %s : ", createdTask.getId()));
+                        break;
 
                     case 2:
                         System.out.println("Enter Id Of Task Which You Want To Update : ");
@@ -115,7 +130,7 @@ public class ToDoApplication {
                 }
             } catch (Exception e) {
                 System.out.println("System Failure At Task Manager Level");
-                e.printStackTrace();
+                System.out.println(e.getMessage());
             }
         } while (!exit);
 
@@ -139,8 +154,13 @@ public class ToDoApplication {
                 switch (choice) {
                     case 1:
                         User user = userService.prepareUserToCreate(br);
-                        User createdUser = userService.createUser(user);
-                        System.out.println(String.format("User created with Id: %s And Email: %s", createdUser.getId(), createdUser.getEmail()));
+                        String userValidationResponse = userService.validateUser(user);
+                        if (userValidationResponse.equalsIgnoreCase("Valid")) {
+                            User createdUser = userService.createUser(user);
+                            System.out.println(String.format("User created with Id: %s And Email: %s", createdUser.getId(), createdUser.getEmail()));
+                        } else {
+                            System.out.println(userValidationResponse);
+                        }
                         break;
 
                     case 2:
